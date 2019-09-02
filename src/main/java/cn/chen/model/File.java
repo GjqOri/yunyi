@@ -7,7 +7,7 @@ public class File {
     private String md5;
     private String fileName;
     @NotNull(message = "文件描述必须填")
-    @Size(min = 8, message = "文件描述应大于8个字符")
+    @Size(min = 15, message = "文件描述有点短")
     private String fileDetail;
     private User uploader;
     private String creationTime;
@@ -16,6 +16,15 @@ public class File {
     private int downloadNum;
     private String fileType;
     private String sizeUnit;
+    private String name1;
+
+    public String getName1() {
+        return name1;
+    }
+
+    public void setName1(String name1) {
+        this.name1 = name1;
+    }
 
     public String getSizeUnit() {
         return sizeUnit;

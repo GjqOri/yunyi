@@ -29,11 +29,11 @@
 <!-- 详情页 -->
         </div>
         <div class="textinfo">
-            <span>积分：${user.integral}</span>
+<%--            <span>积分：${user.integral}</span>--%>
             <span>发布数：${user.askingNumber}</span>
             <span>回答数：${user.answerNumber}</span>
+            <span>资料数：${user.uploadNumber}</span>
         </div>
-
        
         <div class="bot"></div>
         <div class="detailbtn"><i class="iconfont icon-unfold"></i> <span>详细资料</span></div>
@@ -41,57 +41,19 @@
             <p>班&emsp;&emsp;级：${user.userClass}</p>
             <p>学&emsp;&emsp;号：${user.studentNo}</p>
             <p>邮&emsp;&emsp;箱：${user.email}</p>
+            <p>Q&emsp;&emsp;Q：${user.userQq}
+                <a target="_blank" href="http://wpa.qq.com/msgrd?v=3&uin=${user.userQq}&site=qq&menu=yes">
+                    立刻交谈
+                </a>
+            </p>
         </div>
     </div>
     
  <!--  历史提问   -->
-<div id="myquestion">
-    <ul class="menu">
-        <li><strong>ta的提问</strong></li>
-        <li><a id="answer">ta的回答</a></li>
-    </ul>
-    <div style="width:60%;height:100px;margin-left:50px;">
-    <table>
-        <c:forEach var="i" items="${questions}">
 
-            <tr>
-                <div style="margin-top:20px">
-                    <font style="size:20px;color:#989898;">创建时间${i.creationTime }</font>
-                    <a href="/question/detail/${i.id}"><h3>${i.questionName }</h3></a>
-                    <h3>${i.questionContent }</h3>
-<%--                    <p>赞同数 &emsp;评论数</p>--%>
-                    <hr>
-                    <br>
-                </div>
-            </tr>
-        </c:forEach>
-    </table>
-	</div>
-</div>
 
 <!-- 历史问答 -->
 
-<div id="myanswer" style="display:none">
-    <ul class="menu">
-         <li><a id="question">ta的提问</a></li>
-        <li><strong>ta的回答</strong></li>
-    </ul>
-    <div  style="width:60%;height:100px;margin-left:50px">
-    <table>
-        <c:forEach var="i" items="${answers}">
-            <tr>
-                <div style="margin-top:20px">
-                    <font style="size:20px;color:#989898;">创建时间${i.answerTime}</font>
-                    <a href="/question/detail/${i.question.id}"><h3>${i.answerContent}</h3></a>
-<%--                    <h4>我的回答</h4>--%>
-                    <hr>
-                    <br>
-                </div>
-            </tr>
-        </c:forEach>
-    </table>
-</div>
-</div>
 
 </div>
 
@@ -110,7 +72,7 @@
     var cnt=0;
     $('.personInfo .detailbtn').click(function () {
         if(cnt===0){
-            bot.animate({height:'200px'},showDetail);
+            bot.animate({height:'240px'},showDetail);
             function showDetail(){
                 detail.show();
             }

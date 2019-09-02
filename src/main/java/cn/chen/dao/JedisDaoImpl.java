@@ -9,6 +9,7 @@ import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.Transaction;
 
 import java.util.List;
+import java.util.Set;
 
 @Component
 public class JedisDaoImpl implements JedisDao {
@@ -25,9 +26,15 @@ public class JedisDaoImpl implements JedisDao {
         Jedis jedis = null;
         try {
             jedis = jedisPool.getResource();
+            if (jedis.exists(email + SEND)) {
+                jedis.del(email + SEND);
+            }
+            if (jedis.exists(email + CODE)) {
+                jedis.del(email + CODE);
+            }
             Transaction transaction = jedis.multi();
             transaction.set(email + SEND, "1", "nx", "ex", TIME);
-            transaction.set(email + CODE, code, "nx", "ex", TIME);
+            transaction.set(email + CODE, code, "nx", "ex", TIME + 200);
             List<Object> objects = transaction.exec();
             for (Object object : objects) {
                 if (!"OK".equals(object)) {
@@ -126,6 +133,33 @@ public class JedisDaoImpl implements JedisDao {
             jedis = jedisPool.getResource();
             jedis.del(email + SEND);
             jedis.del(email + CODE);
+        } finally {
+            close(jedis);
+        }
+    }
+
+    @Override
+    public void addNumByName(int id, String name) {
+        Jedis jedis = null;
+        try {
+            jedis = jedisPool.getResource();
+            Double s = jedis.zscore(id + "", name);
+            if (s == null) {
+                jedis.zadd(id + "", 1, name);
+            } else {
+                jedis.zincrby(id + "", s + 1, name);
+            }
+        } finally {
+            close(jedis);
+        }
+    }
+
+    @Override
+    public Set<String> getNamesById(int id) {
+        Jedis jedis = null;
+        try {
+            jedis = jedisPool.getResource();
+            return jedis.zrevrange(id + "", 0, 2);
         } finally {
             close(jedis);
         }

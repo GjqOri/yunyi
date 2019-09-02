@@ -12,7 +12,7 @@
    <script src="${hello}js/jquery-3.3.1.min.js"></script>
    <script src="${hello}js/bootstrap.js"></script>
    <script src="${hello}layer-v3.1.1/layer/layer.js"></script>
-	<script src="${hello}css&js/bootstrap.min.js"></script>
+<%--	<script src="${hello}css&js/bootstrap.min.js"></script>--%>
 	<script>
 		var test = 1;
 		var zan = 1;
@@ -78,18 +78,16 @@ color:white;
 					<br>
 					 <p style="margin-top: 20px"><strong><h3 style="color:#202020">${Question.questionName}</h3></strong></p>
 					<br>
-					 <p ><h4 style="color:#303030">${Question.questionContent}</h4></p>
-
+					 <div style="color:#303030">${Question.questionContent}</div>
 					<div>
-						<br>
-						<button style="color:#ffffff;background-color:#505050" id="huida" type="submit" class="btn btn-default"><span class="glyphicon glyphicon-pencil"></span>&nbsp;我来回答</button>
 
+						<button style="color:#ffffff;background-color:#505050" id="huida" type="submit" class="btn btn-default"><span class="glyphicon glyphicon-pencil"></span>&nbsp;我来回答</button>
 					</div>
 					<div>
 						<p align=right>
 							<span style="color:#202020"></span>
 							<img alt="上传者头像" title="上传者头像" width="16px" height="16px" style="color:#202020" src="${hello}user/avatar/${Question.questioner.id}">
-							<a style="color:	#505050" href="#">${Question.questioner.userName}</a>
+							<a style="color:	#505050" href="${hello}other/${Question.questioner.id}">${Question.questioner.userName}</a>
 							&nbsp
 							<text style="color:#505050">${Question.creationTime}</text>
 						</p>
@@ -102,7 +100,6 @@ color:white;
 							<button id="answer" class="btn btn-primary">回答</button>
 							<span id="answer-cancel" style="margin-left: 10px; cursor: pointer">取消</span>
 						</div>
-
 					</div>
 			<br>
             <div style="height: 50px; padding: 15px; box-shadow: inset 1px -1px 1px #444, inset -1px 1px 1px #444;">
@@ -131,10 +128,10 @@ color:white;
 							<div style="width:100px;height:100px;float:left;margin-top:20px;margin-left:30px">
 								<p><img src="${hello}user/avatar/${i.answerUser.id}"style=" width:45px ;height:45px">
 								</p>
-								<p><a style="color:#202020" href="${hello}others.jsp">${i.answerUser.userName}</a></p>
+								<p><a style="color:#202020" href="${hello}other/${i.answerUser.id}">${i.answerUser.userName}</a></p>
 							</div>
-							<div style="width:400px;float:left;margin-top:20px;margin-left:30px;">
-								<h3  style="color:#202020">${i.answerContent}</h3>
+							<div style="width:480px;float:left;margin-top:20px;margin-left:30px;">
+								<div  style="color:#202020">${i.answerContent}</div>
 							</div>
 							<div style="width:100px;height:100px;float:left;margin-top:20px;margin-left:30px;">
 								<h4 style="color:#202020;line-height:80px">第${j}楼</h4>
@@ -145,14 +142,14 @@ color:white;
 								<img onclick="star($(this), '${i.id}')" id="dianzan" src="${hello}image/dianzan1.png" style="cursor:pointer;height:25px;width:25px">
 								<span id="likenum">${i.likenum}</span>
 							</span>
-					&emsp;&emsp;&emsp;<a style="color:#202020" id="huifu"><span class="glyphicon glyphicon-comment"></span></a>
-					&emsp;&emsp;&emsp;<img id="getdown" src="${hello}image/down.png" style="cursor:pointer;height:25px;width:25px">
+<%--					&emsp;&emsp;&emsp;<a style="color:#202020" id="huifu"><span class="glyphicon glyphicon-comment"></span></a>--%>
+<%--					&emsp;&emsp;&emsp;<img id="getdown" src="${hello}image/down.png" style="cursor:pointer;height:25px;width:25px">--%>
 							</div>
 						</div>
            <div id="dpinglun" style="display:none;background-color:#E0E0E0;margin-left:180px;width:70%;height:70px;">
            		<div style="width:50px;float:left">
            			 <img src="${hello}user/avatar/${i.answerUser.id}" style=" width:45px ;height:45px">
-           			<br><a href="others.jsp" style="color:#202020">${i.answerUser.userName}</a>
+           			<br><a href="${hello}other/${i.answerUser.id}" style="color:#202020">${i.answerUser.userName}</a>
            		</div>
            		<div style="margin-left:50px;float:left;width:60%;height:70px;">
            			 <font style="line-height:80px;color:#202020">${i.answerTime}</font>
@@ -161,15 +158,12 @@ color:white;
            			 <font style="line-height:80px;color:#202020">${i.answerTime}</font>
            			&emsp;
 					<a  style="color:#202020;cursor:pointer"id="doubleclick"><span class="glyphicon glyphicon-thumbs-up"></span></a><text></text>
-      
            		</div>	
            </div>
             </tr>
 							<hr style=" height:2px;width:80%;border:none;border-top:2px dotted #808080;" />
 							<c:set scope="page" value="${j + 1}" var="j" />
           </c:forEach>
-
-
           </table>
         </div>
        
@@ -179,8 +173,50 @@ color:white;
 <script type="text/javascript" src="${hello}js/wangEditor.min.js"></script>
 <script>
 	// 上传图片（举例）var E = window.wangEditor
-	var E = window.wangEditor;
-	var editor = new E('#editor');
+	let E = window.wangEditor;
+  let editor = new E('#editor');
+  editor.customConfig.uploadImgServer = '${hello}user/upload';
+  let l;
+  editor.customConfig.uploadImgHooks = {
+      before: function (xhr, editor, files) {
+          // 图片上传之前触发
+          // xhr 是 XMLHttpRequst 对象，editor 是编辑器对象，files 是选择的图片文件
+
+          // 如果返回的结果是 {prevent: true, msg: 'xxxx'} 则表示用户放弃上传
+          // return {
+          //     prevent: true,
+          //     msg: '放弃上传'
+          // }
+          l = layer.load();
+      },
+
+      error: function (xhr, editor) {
+          // 图片上传出错时触发
+          // xhr 是 XMLHttpRequst 对象，editor 是编辑器对象
+          layer.msg('上传错误');
+          layer.close(l);
+      },
+      timeout: function (xhr, editor) {
+          // 图片上传超时时触发
+          // xhr 是 XMLHttpRequst 对象，editor 是编辑器对象
+          layer.msg('上传超时，请检查网络');
+          layer.close(l);
+      },
+      fail: function (xhr, editor, result) {
+          // 图片上传并返回结果，但图片插入错误时触发
+          // xhr 是 XMLHttpRequst 对象，editor 是编辑器对象，result 是服务器端返回的结果
+          layer.msg(JSON.parse(xhr.responseText).msg);
+          layer.close(l);
+      },
+      success: function (xhr, editor, result) {
+          // 图片上传并返回结果，图片插入成功之后触发
+          // xhr 是 XMLHttpRequst 对象，editor 是编辑器对象，result 是服务器端返回的结果
+          layer.close(l);
+      },
+  };
+  editor.customConfig.customAlert = function (info) {
+      // info 是需要提示的内容
+  };
 	// 或者 var editor = new E( document.getElementById('editor') )
 	editor.create();
 	$('#answer').on('click', function () {
@@ -190,6 +226,9 @@ color:white;
 			data: {'questionId': ${Question.id}, 'answerContent': editor.txt.html()},
 			success: function (data) {
 				layer.msg(data.msg);
+				if (data.code == 0) {
+					window.location.reload();
+				}
 			}
 		});
 	});

@@ -1,14 +1,14 @@
 <%@ page language="java" contentType="text/html; charset=utf-8"
          pageEncoding="utf-8" %>
 <!DOCTYPE html>
-<%-- <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %> --%>
+ <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <html>
 <head>
     <meta charset="utf-8">
     <title>发表问题</title>
     <!--引入wangEditor.css-->
-    <link rel="stylesheet" type="text/css" href="${hello}dist/css/wangEditor.min.css">
+<%--    <link rel="stylesheet" type="text/css" href="${hello}dist/css/wangEditor.min.css">--%>
     <script src="js/jquery-2.2.3.min.js"></script>
     <style type="text/css">
         .container {
@@ -117,7 +117,10 @@
         <p style="margin-top: 50px">
             <strong>说说问题的提出背景：</strong>
         </p>
-            <textarea id="textarea1" value=""></textarea>
+        <div id="textarea1" style="text-align: left">
+
+        </div>
+
         <p>
             <input id="fabu" style="width:50px;height:30px;background-color: #666666; border-radius:3px; color:#FFFFFF"
                    type="submit" value="提交">
@@ -127,13 +130,55 @@
 </div>
 
 
-<script type="text/javascript" src="${hello}dist/js/lib/jquery-1.10.2.min.js"></script>
-<script type="text/javascript" src="${hello}dist/js/wangEditor.min.js"></script>
+<%--<script type="text/javascript" src="${hello}dist/js/lib/jquery-1.10.2.min.js"></script>--%>
+<script type="text/javascript" src="${hello}js/wangEditor.min.js"></script>
 
 <script type="text/javascript">
-    var editor = new wangEditor('textarea1');
+    let editor = new wangEditor('#textarea1');
     // 上传图片（举例）
-    editor.config.uploadImgFileName = 'myFileName';
+    //editor.config.uploadImgFileName = 'myFileName';
+    let l;
+    editor.customConfig.uploadImgServer = '/user/upload';
+    editor.customConfig.uploadImgHooks = {
+        before: function (xhr, editor, files) {
+            // 图片上传之前触发
+            // xhr 是 XMLHttpRequst 对象，editor 是编辑器对象，files 是选择的图片文件
+
+            // 如果返回的结果是 {prevent: true, msg: 'xxxx'} 则表示用户放弃上传
+            // return {
+            //     prevent: true,
+            //     msg: '放弃上传'
+            // }
+            l = layer.load();
+        },
+
+        error: function (xhr, editor) {
+            // 图片上传出错时触发
+            // xhr 是 XMLHttpRequst 对象，editor 是编辑器对象
+            layer.msg('上传错误');
+            layer.close(l);
+        },
+        timeout: function (xhr, editor) {
+            // 图片上传超时时触发
+            // xhr 是 XMLHttpRequst 对象，editor 是编辑器对象
+            layer.msg('上传超时，请检查网络');
+            layer.close(l);
+        },
+        fail: function (xhr, editor, result) {
+            // 图片上传并返回结果，但图片插入错误时触发
+            // xhr 是 XMLHttpRequst 对象，editor 是编辑器对象，result 是服务器端返回的结果
+            layer.msg(JSON.parse(xhr.responseText).msg);
+            layer.close(l);
+        },
+        success: function (xhr, editor, result) {
+            // 图片上传并返回结果，图片插入成功之后触发
+            // xhr 是 XMLHttpRequst 对象，editor 是编辑器对象，result 是服务器端返回的结果
+            layer.close(l);
+        },
+    };
+    editor.customConfig.customAlert = function (info) {
+        // info 是需要提示的内容
+    };
     editor.create();
 </script>
 <script src="${hello}layer-v3.1.1/layer/layer.js"></script>
@@ -143,7 +188,6 @@ $(document).ready(function() {
     $('#show').on('click',function () {
         var index = document.getElementById('s2').selectedIndex;
         var option2 = document.getElementById('s2').options[index].text;
-        alert(option2);
     });
     $('#fabu').on('click', function () {
         var l = layer.load();
@@ -159,7 +203,7 @@ $(document).ready(function() {
         $.ajax({
             url: 'question/save',
             type: 'post',
-            data: {'questionName': f1, 'questionContent': f2, 'name1': option1, 'name2': option2},
+            data: {'questionName': f1, 'questionContent': editor.txt.html(), 'name1': option1, 'name2': option2},
             success: function (data) {
                 layer.close(l);
                 layer.msg(data.msg);
@@ -336,7 +380,6 @@ $(document).ready(function() {
     function redirec(x)
     {
         var temp = document.frm.s2;
-        console.log(x);
         temp.innerHTML='';
         for (i=0;i<select2[x].length;i++)
         {

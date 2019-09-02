@@ -6,8 +6,8 @@ import cn.chen.data.exceptions.NoSuchDataException;
 import cn.chen.data.exceptions.YunyiException;
 import cn.chen.data.result.AbstractResult;
 import cn.chen.data.result.MsgResult;
-import cn.chen.model.File;
-import cn.chen.model.User;
+import cn.chen.model.*;
+import cn.chen.service.CommentDaoService;
 import cn.chen.service.FileDaoService;
 import cn.chen.utils.QiniuUtils;
 import cn.chen.utils.Utils;
@@ -29,16 +29,20 @@ import javax.validation.Valid;
 @RequestMapping(value = "/file", method = RequestMethod.POST)
 public class FileController {
     private FileDaoService fileDaoService;
+    private CommentDaoService commentDaoService;
     private JedisDao jedisDao;
     // private UserDaoService userDaoService;
     private StandardServletMultipartResolver multipartResolver;
-    public FileController(FileDaoService fileDaoService, StandardServletMultipartResolver multipartResolver, JedisDao jedisDao) {
+    public FileController(FileDaoService fileDaoService, StandardServletMultipartResolver multipartResolver, JedisDao jedisDao,
+                          CommentDaoService commentDaoService) {
         this.fileDaoService = fileDaoService;
         this.multipartResolver = multipartResolver;
         this.jedisDao = jedisDao;
+        this.commentDaoService = commentDaoService;
     }
 
-    @RequestMapping("/upload")
+
+    @RequestMapping("/upload") // 文件上传
     @ResponseBody
     public AbstractResult upload(@Valid File file, Errors errors, HttpServletRequest request, HttpSession session) {
         if (errors.hasErrors()) {
@@ -48,15 +52,15 @@ public class FileController {
             return new MsgResult(-1, "请选择文件");
         }
         User user = (User) session.getAttribute("user");
-        jedisDao.checkCommit(user.getId(), CommitTypeEnum.COMMIT_UPLOAD);
-
+        jedisDao.checkCommit(user.getId(), CommitTypeEnum.COMMIT_UPLOAD); // 检测是否上传频繁
         file.setUploader(user);
-
         MsgResult msgResult = new MsgResult();
         if (fileDaoService.uploadFile(file, multipartResolver.resolveMultipart(request))) {
             msgResult.setCode(0);
             msgResult.setMsg("上传成功");
             jedisDao.setCommitState(user.getId(), CommitTypeEnum.COMMIT_UPLOAD);
+            user.setUploadNumber(user.getUploadNumber() + 1);
+            session.setAttribute("user", user);
         } else {
             msgResult.setCode(-1);
             msgResult.setMsg("上传失败");
@@ -64,6 +68,7 @@ public class FileController {
         return msgResult;
     }
 
+    // 通过文件的md5下载文件给客户端
     @RequestMapping(value = "/download/{md5}", method = RequestMethod.GET)
     public void download(@PathVariable String md5, HttpServletRequest request, HttpServletResponse response) {
         File file = fileDaoService.getFileByMD5(md5);
@@ -80,9 +85,37 @@ public class FileController {
     }
 
 
+    @RequestMapping("/save") // 评论文件
+    @ResponseBody
+    public AbstractResult save(@Valid Comment comment, Errors errors, HttpSession session, String md5) {
+        if (errors.hasErrors()) {
+            Utils.dealErrors(errors);
+        }
+        comment.setCommentUser((User) session.getAttribute("user"));
+        File file = new File();
+        file.setMd5(md5);
+        comment.setFile(file);
+        MsgResult msgResult = new MsgResult();
+        if (commentDaoService.save(comment)) {
+            msgResult.setCode(0);
+            msgResult.setMsg("回复成功");
+        } else {
+            msgResult.setCode(-1);
+            msgResult.setMsg("回复失败");
+        }
+        return msgResult;
+    }
+
+
+    // 根据MD5获取文件的具体信息，添加数据并返回具体的视图
     @RequestMapping(value = "/detail/{md5}", method = RequestMethod.GET)
     public String detail(@PathVariable String md5, Model model) {
-        model.addAttribute("file", fileDaoService.getFileByMD5(md5));
+        File file = fileDaoService.getFileByMD5(md5);
+        if (file == null) {
+            throw new NoSuchDataException();
+        }
+        model.addAttribute("file", file);
+        model.addAttribute("comment", commentDaoService.getCommentsByFileMD5(md5));
         model.addAttribute("hello", "../../");
         return "ziliao";
     }

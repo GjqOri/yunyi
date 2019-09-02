@@ -83,8 +83,30 @@ public class FileDaoServiceImpl implements FileDaoService {
     }
 
     @Override
-    public List<File> getFiles() {
-        return fileDao.getFiles();
+    public List<File> getFiles(int start, int length, Integer order) {
+        if (order == null || order != 2) {
+            return fileDao.getFiles(start, length);
+        }
+        return fileDao.getFilesOrderByDownloadNum(start, length);
+    }
+
+    @Override
+    public int getFilesCount() {
+        return fileDao.getFilesCount();
+    }
+
+    @Override
+    public List<File> getFilesByName1OrderBy(String name1, Integer order, int start, int length) {
+        String column = "download_num";
+        if (order == null || order != 2) {
+            column = "file.creation_time";
+        }
+        return fileDao.getFilesByName1OrderBy(name1, column, start, length);
+    }
+
+    @Override
+    public int getFilesByName1Count(String name1) {
+        return fileDao.getFilesByName1Count(name1);
     }
 
     @Override

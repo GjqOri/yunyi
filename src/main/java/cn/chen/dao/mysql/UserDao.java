@@ -9,4 +9,14 @@ public interface UserDao {
     int updateUser(User user);
     int addAskingNum(int userId);
     int addAnswerNum(int userId);
+    int addUploadFileNum(int userId);
+    int deleteUploadFileNum(int userId);
+
+    int deleteAskingNum(int userId);
+    int deleteAnswerNum(int userId);
+    int deleteQuestionNum(int questionId);
+
+    int deleteQuestion(int questionId, int userId);
+    int deleteAnswer(int answerId, int userId);
+    int deleteFile(String fileMd5, int userId);
 }

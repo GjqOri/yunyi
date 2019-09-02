@@ -2,13 +2,16 @@
 <%@ page language="java" contentType="text/html; charset=utf-8"
 				 pageEncoding="utf-8"%>
 <!DOCTYPE html>
- <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <html>
 <head>
 	<meta charset="utf-8">
 	<title>问答专栏</title>
-	<link rel="stylesheet" href="${hello}css&js/bootstrap.min.css">
+	<c:if test="${empty param.order or empty param.page}">
+		<c:redirect url="${hello}column?order=1&page=1"/>
+	</c:if>
+<%--	<link rel="stylesheet" href="${hello}css&js/bootstrap.min.css">--%>
 	<link rel="stylesheet" href="${hello}css&js/login.css" />
 	<link href="${hello}css&js/bootstrap.css" rel="stylesheet" type="text/css" media="all" />
 	<link href="${hello}css&js/scrollbar.css" rel="stylesheet" type="text/css" media="all" />
@@ -61,6 +64,14 @@
 		tr, td {
 			vertical-align: middle;
 		}
+
+		.page {
+			margin-right: 5px;
+			padding: 7px;
+			border-radius: 2px;
+			border: 1px solid #000000;
+		}
+
 	</style> 
 	
 <style type="text/css">
@@ -73,14 +84,14 @@ a:hover{
 </style>
 	<style type="text/css">
 
-	
+	3html
 	</style>
 	<script type="application/x-javascript"> addEventListener("load", function() { setTimeout(hideURLbar, 0); }, false); function hideURLbar(){ window.scrollTo(0,1); } </script>
 	<!---->
-	<link href='http://fonts.useso.com/css?family=Raleway:400,200,100,300,500,600,700,800,900' rel='stylesheet' type='text/css'>
-	<link href='http://fonts.useso.com/css?family=Open+Sans+Condensed:300,300italic,700' rel='stylesheet' type='text/css'>
+<%--	<link href='http://fonts.useso.com/css?family=Raleway:400,200,100,300,500,600,700,800,900' rel='stylesheet' type='text/css'>--%>
+<%--	<link href='http://fonts.useso.com/css?family=Open+Sans+Condensed:300,300italic,700' rel='stylesheet' type='text/css'>--%>
 
-	<link href="${hello}css&js/styles.css" rel="stylesheet">
+<%--	<link href="${hello}css&js/styles.css" rel="stylesheet">--%>
 	<link rel="stylesheet" type="text/css" href="${hello}css&js/component.css" />
 
 	<link href="${hello}css&js/animate.min.css" rel="stylesheet">
@@ -90,8 +101,8 @@ a:hover{
 	</script>
 	<!-- //animation-effect -->
 
-	<script src="${hello}css&js/jquery.min.js"></script>
-	<script src="${hello}css&js/bootstrap.min.js"></script>
+<%--	<script src="${hello}css&js/jquery.min.js"></script>--%>
+<%--	<script src="${hello}css&js/bootstrap.min.js"></script>--%>
 	
 </head>
 <body style="background-color:#F6F6F6;background-repeat :no-repeat;background-position: right bottom;background-attachment:fixed;">
@@ -102,19 +113,21 @@ a:hover{
 		</div>
 		<div id="navbar" class="collapse navbar-collapse">
 			<ul class="nav navbar-nav">
-			<li class="active"><a style="font-size:20px;color:#888888" href="${hello}column" id="test">所有</a></li>
-				<li class="active"><a class="scroll" href="${hello}column?name1=计算机系" id="cpu">计算机系</a></li>
-				<li class="active"><a class="scroll" href="${hello}column?name1=化工学院" id = "chemical">化工学院</a></li>
-				<li class="active"><a class="scroll" href="${hello}column?name1=农牧学院" id ="husbandry">农牧学院</a></li>
-				<li class="active"><a class="scroll" href="${hello}column?name1=机械学院" id="machinery">机械学院</a></li>
-				<li class="active"><a class="scroll" href="${hello}column?name1=财经学院" id="economy">财经学院</a></li>
-				<li class="active"><a class="scroll" href="${hello}column?name1=医学院" id="medical">医学院</a></li>
-				<li class="active"><a class="scroll" href="${hello}column?name1=土木学院" id="build">土木学院</a></li>
-				<li class="active"><a class="scroll" href="${hello}column?name1=其它">其它</a></li>
+				<li class="active"><a style="font-size:20px;color:#888888" href="${hello}column?order=1" id="test">所有</a></li>
+				<li class="active"><a style="font-size:20px;color:#888888" href="${hello}hot">热门</a></li>
+				<li class="active"><a style="font-size:20px;color:#888888" href="${hello}recommend">推荐</a></li>
+				<li class="active"><a class="scroll" href="${hello}column?name1=计算机系&order=1&page=1" id="cpu">计算机系</a></li>
+				<li class="active"><a class="scroll" href="${hello}column?name1=化工学院&order=1&page=1" id = "chemical">化工学院</a></li>
+				<li class="active"><a class="scroll" href="${hello}column?name1=农牧学院&order=1&page=1" id ="husbandry">农牧学院</a></li>
+				<li class="active"><a class="scroll" href="${hello}column?name1=机械学院&order=1&page=1" id="machinery">机械学院</a></li>
+				<li class="active"><a class="scroll" href="${hello}column?name1=财经学院&order=1&page=1" id="economy">财经学院</a></li>
+				<li class="active"><a class="scroll" href="${hello}column?name1=医学院&order=1&page=1" id="medical">医学院</a></li>
+				<li class="active"><a class="scroll" href="${hello}column?name1=土木学院&order=1&page=1" id="build">土木学院</a></li>
+				<li class="active"><a class="scroll" href="${hello}column?name1=其它&order=1&page=1">其它</a></li>
 			</ul>
 			<ul class="nav navbar-nav pull-right">
 				<li>
-					<a style="color:#FFFFFF" href="${hello}user">${not empty user.userName ? user.userName:'登陆'}</a>
+					<a style="color:#FFFFFF" href="${hello}user">${not empty user.userName ? user.userName:'登录'}</a>
 				</li>
 			</ul>
 		</div>
@@ -171,7 +184,7 @@ a:hover{
 			var newUL=$("<ul></ul>");
 			newUL.append($("<li class='title'>"+item2.title+"</li>"));
 			item2.content.forEach(function (item3) {
-				newUL.append($("<li><a style='color: #CCCCCC' href='${hello}column?name1=" + item2.belong + "&name2="+item3+"'>"+item3+"</a></li>"));
+				newUL.append($("<li><a style='color: #CCCCCC' href='${hello}column?page=1&order=1&name1=" + item2.belong + "&name2="+item3+"'>"+item3+"</a></li>"));
 				//id++
 			});
 			newnode.append(newUL);
@@ -220,15 +233,17 @@ a:hover{
 				<c:choose>
 					<c:when test="${not empty param.order and param.order eq 1 }">
 						<a style="margin-left: 5px; padding: 10px; color: #646464;"
-							 href="${hello}column?name1=${param.name1}&name2=${param.name2}&searchContent=${param.searchContent}&order=2"><span>按热度排序</span></a>
+							 href="${hello}column?name1=${param.name1}&name2=${param.name2}&searchContent=${param.searchContent}&order=2&page=${param.page}">
+							<span>按热度排序</span></a>
 					</c:when>
 					<c:otherwise>
 						<a style="margin-left: 5px; padding: 10px; color: #646464;"
-							 href="${hello}column?name1=${param.name1}&name2=${param.name2}&searchContent=${param.searchContent}&order=1"><span>按时间排序</span></a>
+							 href="${hello}column?name1=${param.name1}&name2=${param.name2}&searchContent=${param.searchContent}&order=1&page=${param.page}">
+							<span>按时间排序</span></a>
 					</c:otherwise>
 				</c:choose>
 				<a style="padding: 10px; color: #646464;" href="${hello}files?name1=${param.name1}&name2=${param.name2}"><span>资料</span></a>
-				<a style="padding: 10px; color: #646464;"><span>当前栏目：${param.name2}</span></a>
+				<a style="padding: 10px; color: #646464;"><span>当前栏目：${empty param.name2 ? param.name1 : param.name2}</span></a>
 				<label class="control-label">
 					&nbsp;<input class="form-control" type="text" placeholder="要搜索的内容" name="searchContent" value="${param.searchContent}">
 				</label>
@@ -236,7 +251,7 @@ a:hover{
 			</div>
 			<script>
 				$('#search').on('click', function () {
-					window.location = '${hello}column?name1=${param.name1}&name2=${param.name2}&order=${param.order}&searchContent='
+					window.location = '${hello}column?name1=${param.name1}&name2=${param.name2}&order=${param.order}&page=1&searchContent='
 							+ $("input[name='searchContent']").val();
 				})
 			</script>
@@ -250,6 +265,7 @@ a:hover{
 							<%--							<font style="size:20px;color:#989898;">${i.creationTime }</font>--%>
 						<h3>
 							<a style="color:#1A1A1A" href="${hello}question/detail/${i.id}">${i.questionName }</a>
+							<small style="color: #ff0080">${i.name1}</small>
 							<span style="float: right; font-size: 13px; color: #999999">${i.creationTime }</span>
 						</h3><br>
 						<p class="content-p" style="color:#000000">${i.questionContent }</p><br>
@@ -266,9 +282,30 @@ a:hover{
 				</c:forEach>
 			</div>
 		</div>
-
 			<div class="footer_top_agileits">
-
+				<div style="float: left; margin-top: 5px;">
+					<c:if test="${param.page > 1}">
+						<a href="${hello}column?name1=${param.name1}&name2=${param.name2}&searchContent=${param.searchContent}
+								&order=${param.order}&page=${param.page - 1}" class="page">上一页</a>
+					</c:if>
+					<c:forEach begin="1" end="${pages}" step="1" var="i">
+						<c:choose>
+							<c:when test="${not empty param.page and i eq param.page or empty param.page and i eq 1}">
+								<span style="margin-right: 5px">${i}</span>
+							</c:when>
+							<c:otherwise>
+								<a href="${hello}column?name1=${param.name1}&name2=${param.name2}&searchContent=${param.searchContent}
+								&order=${param.order}&page=${i}"
+										class="page">
+										${i}</a>
+							</c:otherwise>
+						</c:choose>
+					</c:forEach>
+					<c:if test="${empty param.page or param.page < pages}">
+						<a href="${hello}column?name1=${param.name1}&name2=${param.name2}&searchContent=${param.searchContent}
+						&order=${param.order}&page=${param.page + 1}" class="page">下一页</a>
+					</c:if>
+				</div>
 				<div style=" float:right" align="center">
 
 					<a style="margin-top:50px">侵权举报 网上有害信息举报专区</a><p style="margin-top:10px"></p>
@@ -370,7 +407,7 @@ jQuery(document).ready(function($) {
 
 		});
 	}
-
+	$('p>img').css('width', '48px');
 </script>
 
 </body>

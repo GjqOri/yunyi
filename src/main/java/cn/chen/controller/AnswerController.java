@@ -21,18 +21,18 @@ import javax.validation.Valid;
 @RequestMapping(value = "/answer", method = RequestMethod.POST)
 public class AnswerController {
     private AnswerDaoService answerDaoService;
-    private UserDaoService userDaoService;
-    public AnswerController(AnswerDaoService answerDaoService, UserDaoService userDaoService) {
+    public AnswerController(AnswerDaoService answerDaoService) {
         this.answerDaoService = answerDaoService;
-        this.userDaoService = userDaoService;
     }
-    @RequestMapping("/save")
+
+    @RequestMapping("/save")  // 保存回答
     @ResponseBody
     public AbstractResult save(@Valid Answer answer, Errors errors, HttpSession session, int questionId) {
         if (errors.hasErrors()) {
             Utils.dealErrors(errors);
         }
-        answer.setAnswerUser((User) session.getAttribute("user"));
+        User user = (User) session.getAttribute("user");
+        answer.setAnswerUser(user);
         Question question = new Question();
         question.setId(questionId);
         answer.setQuestion(question);
@@ -40,14 +40,15 @@ public class AnswerController {
         if (answerDaoService.save(answer)) {
             msgResult.setCode(0);
             msgResult.setMsg("回复成功");
-            session.setAttribute("user", userDaoService.getUserById(answer.getAnswerUser().getId()));
+            user.setAnswerNumber(user.getAnswerNumber() + 1);
+            session.setAttribute("user", user);
         } else {
             msgResult.setCode(-1);
             msgResult.setMsg("回复失败");
         }
         return msgResult;
     }
-    @RequestMapping("/star")
+    @RequestMapping("/star")  // 给回答点赞
     @ResponseBody
     public AbstractResult star(int answerId, HttpSession session) {
         MsgResult msgResult = new MsgResult();

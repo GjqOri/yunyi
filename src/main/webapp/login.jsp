@@ -10,7 +10,7 @@
 	<script src="layer-v3.1.1/layer/layer.js"></script>
 	<script src="css&js/jquery.min.js"></script>
 	<script src="css&js/bootstrap.min.js"></script>
-	<script src="layer-v3.1.1/layer/layer.js"></script>
+<%--	<script src="layer-v3.1.1/layer/layer.js"></script>--%>
 	<script>
 		$(document).ready(function() {
 			//关闭
@@ -35,13 +35,19 @@
 				$("#login_container").show(500);
 			});
 		});
+		$(document).keydown(function (event) {
+			if(event.keyCode === 13)
+			{
+				$("#tijiao").trigger('click');
+			}
+		});
 	</script>
 </head>
 <body style="background-image:url(images/denglu.jpg)">
 
 <!-- 登录 -->
 <div id="login_container" style="background:#E6E6FA;margin:80px auto;width:400px;height:550px">
-	<div>
+	<div onclick="window.location = 'index'">
 	    <span style="font-size:23px;color:#708090"><img src="image/timg.png" style="width:90px;height:90px"/>
 	              云 易，让问答变得很容易
 	    </span>
@@ -50,7 +56,7 @@
 	<div style="width:300px;height:300px">
 		<p style="font-size:20px;text-align:center;color:#708090">用户登录</p>
 
-		<input type="text" id="zhanghao" class="form-control" placeholder="账号"  name="noOrEmail" value="" />
+		<input type="text" id="zhanghao" class="form-control" placeholder="学号或邮箱"  name="noOrEmail" value="" />
 		<br>
 		<input type="password" id="mima" style="margin-top:10px" class="form-control" placeholder="密码" name="password" value="" />
 		<br><br>
@@ -127,13 +133,14 @@
 	    </span>
 		<hr style="height:5px;border:none;border-top:5px groove skyblue;" />
 	</div>
-	<div style="width:300px;height:310px">
+	<div style="width:300px;height:330px">
 		<p style="font-size:20px;text-align:center;color:#708090">用户注册</p>
 
 		<input type="text" id="rzhaohao" style="margin-top:10px" class="form-control" placeholder="学号" name="studentNo" value="" />
 		<input type="text" id="rname" style="margin-top:10px" class="form-control" placeholder="昵称"  name="userName" value="" />
 		<input type="password" id="rmima" style="margin-top:10px" class="form-control" placeholder="密码" name="userPassword"  value=""/>
 		<input type="text" id="rbanji" style="margin-top:10px" class="form-control" placeholder="班级"  name="banji" value="" />
+		<input type="text" id="userqq" class="form-control" style="margin-top:10px" placeholder="QQ，为了尽快解决您的问题，请正确填写"  name="userQq" value="" />
 		<input type="text" id="ryouxiang" class="form-control" style="margin-top:10px" placeholder="邮箱"  name="email" value="" />
 		<div>
 			<div  style="heighgt:50px;float:left;margin-top:10px">
@@ -157,7 +164,7 @@
 		</span>
 	</div>
 </div>
-<script src="${hello}layer-v3.1.1/layer/layer.js"></script>
+<%--<script src="${hello}layer-v3.1.1/layer/layer.js"></script>--%>
 <script>
 	$('#QQ').on('click',function(){
 		layer.msg('人家还没得到授权呢~',function(){
@@ -194,10 +201,11 @@
 		var r4 = document.getElementById("rbanji").value;
 		var r5 = document.getElementById("ryouxiang").value;
 		var r6 = document.getElementById("ryanzheng").value;
+		var r7 = document.getElementById("userqq").value;
 		$.ajax({
 			url:  'user/register',
 			type: 'post',
-			data: {'studentNo':r1,'userName':r2,'userPassword':r3,'userClass':r4,'email':r5,'code':r6},
+			data: {'studentNo':r1,'userName':r2,'userPassword':r3,'userClass':r4,'email':r5,'code':r6,'userQq':r7},
 			success:function(data) {
 				layer.msg(data.msg);
 				if(data.code === 0)
@@ -208,13 +216,18 @@
 		})
 	});
 	$('#rgetma').on('click',function(){  //发送验证码
+		var l = layer.load();
 		var m = document.getElementById("ryouxiang").value;
 		$.ajax({
 			url:  '${path}user/register/send',
 			type: 'post',
 			data: {'email':m},
 			success:function(data) {
+				layer.close(l);
 				layer.msg(data.msg);
+			},
+			complete: function () {
+				layer.close(l);
 			}
 		})
 	});
